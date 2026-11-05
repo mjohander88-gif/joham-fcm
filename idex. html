@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JOHAM FCM | Comunidad</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090909;color:white;font-family:Arial,sans-serif}
+header{background:#111;padding:25px 15px;text-align:center;border-bottom:3px solid #ffe600}
+h1{color:#ffe600;font-size:32px;margin:5px}
+header p{color:#ccc}
+main{max-width:850px;margin:auto;padding:20px}
+.card{background:#171717;border:1px solid #333;border-radius:15px;padding:20px;margin:18px 0}
+h2{color:#ffe600}
+button{background:#ffe600;color:#000;border:0;padding:12px 18px;border-radius:9px;font-weight:bold;cursor:pointer}
+input,textarea{width:100%;padding:13px;margin:8px 0;background:#252525;color:white;border:1px solid #555;border-radius:8px}
+.post{background:#202020;padding:17px;border-radius:12px;margin:15px 0}
+.post a{color:#ffe600}
+small{color:#aaa}
+.hidden{display:none}
+footer{text-align:center;padding:25px;color:#aaa}
+</style>
+</head>
+<body>
+
+<header>
+<h1>JOHAM FCM ⚽</h1>
+<p>COMUNIDAD DE APOYO PARA CREADORES</p>
+</header>
+
+<main>
+<div class="card">
+<h2>🔥 ¡Bienvenido a la comunidad!</h2>
+<p>Apoyemos a los creadores de FC Mobile. Descubre vídeos, visita sus publicaciones y apoya a otros talentos.</p>
+</div>
+
+<div class="card">
+<h2>🎬 Vídeos de la comunidad</h2>
+<div id="publicaciones"></div>
+</div>
+
+<div class="card">
+<h2>🔐 Panel de administrador</h2>
+<p>Solo el administrador debe utilizar esta sección.</p>
+<input id="clave" type="password" placeholder="Contraseña de administrador">
+<button onclick="entrar()">Entrar</button>
+
+<div id="panel" class="hidden">
+<h2>Publicar un vídeo</h2>
+<input id="creador" placeholder="Nombre del creador">
+<input id="enlace" placeholder="Enlace del vídeo de TikTok">
+<textarea id="descripcion" placeholder="Descripción del vídeo"></textarea>
+<button onclick="publicar()">Publicar vídeo</button>
+</div>
+</div>
+
+<div class="card">
+<h2>💛 Nuestra comunidad</h2>
+<p>Unidos por FC Mobile. Apoya, comparte y disfruta del contenido.</p>
+</div>
+</main>
+
+<footer>
+<p>© 2026 JOHAM FCM</p>
+<p>Comunidad de apoyo ⚽💛</p>
+</footer>
+
+<script>
+let videos=JSON.parse(localStorage.getItem("johamVideos")||"[]");
+
+function mostrar(){
+const zona=document.getElementById("publicaciones");
+zona.innerHTML="";
+if(videos.length===0){
+zona.innerHTML="<p>Aún no hay vídeos publicados. ¡Pronto habrá contenido!</p>";
+return;
+}
+videos.forEach((v,i)=>{
+zona.innerHTML+=`
+<div class="post">
+<h3>${seguro(v.creador)}</h3>
+<p>${seguro(v.descripcion)}</p>
+<a href="${seguro(v.enlace)}" target="_blank" rel="noopener">▶ VER VÍDEO EN TIKTOK</a>
+${document.getElementById("panel").classList.contains("hidden")?"":`<br><br><button onclick="eliminar(${i})">Eliminar</button>`}
+</div>`;
+});
+}
+
+function seguro(t){
+return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function entrar(){
+if(document.getElementById("clave").value==="JOHAM2026"){
+document.getElementById("panel").classList.remove("hidden");
+mostrar();
+}else{
+alert("Contraseña incorrecta");
+}
+}
+
+function publicar(){
+let creador=document.getElementById("creador").value.trim();
+let enlace=document.getElementById("enlace").value.trim();
+let descripcion=document.getElementById("descripcion").value.trim();
+
+if(!creador||!enlace){alert("Completa el nombre y el enlace");return;}
+try{
+let url=new URL(enlace);
+if(url.protocol!=="https:"||!["tiktok.com","www.tiktok.com","vm.tiktok.com","m.tiktok.com"].includes(url.hostname)){
+alert("Coloca un enlace válido de TikTok");return;
+}
+}catch(e){alert("Enlace no válido");return;}
+
+videos.unshift({creador,enlace,descripcion});
+localStorage.setItem("johamVideos",JSON.stringify(videos));
+document.getElementById("creador").value="";
+document.getElementById("enlace").value="";
+document.getElementById("descripcion").value="";
+mostrar();
+alert("Vídeo publicado");
+}
+
+function eliminar(i){
+videos.splice(i,1);
+localStorage.setItem("johamVideos",JSON.stringify(videos));
+mostrar();
+}
+mostrar();
+</script>
+</body>
+</html>
